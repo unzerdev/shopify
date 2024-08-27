@@ -1,0 +1,81 @@
+api_version = "2024-07"
+
+[[extensions]]
+name = "paymentqp"
+type = "payments_extension"
+handle = "paymentqp"
+payment_session_url = "https://latori-17.ngrok.io/app/payment_session"
+refund_session_url = "https://latori-17.ngrok.io/app/refund_session"
+capture_session_url = "https://latori-17.ngrok.io/app/capture_session"
+void_session_url = "https://latori-17.ngrok.io/app/void_session"
+merchant_label = "QuickPayTesting"
+supported_countries = [
+  "AX",
+  "AL",
+  "AD",
+  "AM",
+  "AT",
+  "BY",
+  "BE",
+  "BA",
+  "BG",
+  "HR",
+  "CY",
+  "CZ",
+  "DK",
+  "EE",
+  "FO",
+  "FI",
+  "FR",
+  "GE",
+  "DE",
+  "GI",
+  "GR",
+  "GL",
+  "GP",
+  "GG",
+  "VA",
+  "HU",
+  "IS",
+  "IE",
+  "IM",
+  "IT",
+  "JE",
+  "XK",
+  "LV",
+  "LI",
+  "LT",
+  "LU",
+  "MT",
+  "YT",
+  "MD",
+  "MC",
+  "ME",
+  "NL",
+  "MK",
+  "NO",
+  "PL",
+  "PT",
+  "RE",
+  "RO",
+  "SM",
+  "RS",
+  "SK",
+  "SI",
+  "ES",
+  "SJ",
+  "SE",
+  "CH",
+  "TR",
+  "UA",
+  "GB"
+]
+# List of supported icons: https://github.com/activemerchant/payment_icons/blob/master/db/payment_icons.yml
+supported_payment_methods = [ "visa", "master", "american_express", "postfinance_card", "postfinance_efinance", "sepadirectdebit", "eps", "bancontact", "ideal", "przelewy24", "payu", "postfinance_card", "postfinance_efinance", "apple_pay" ]
+test_mode_available = true
+supports_3ds = true
+supports_deferred_payments = false
+supports_installments = false
+
+  [[extensions.targeting]]
+  target = "payments.offsite.render"

@@ -1,0 +1,29 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "833ee3d4c6a097b30dafcec45997cb0e"
+name = "Unzer Development"
+handle = "qpdevbox"
+application_url = "https://latori-17.ngrok.io"
+embedded = true
+
+[build]
+automatically_update_urls_on_dev = false
+dev_store_url = "unzer-latori-dev-store.myshopify.com"
+include_config_on_deploy = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "read_orders,unauthenticated_read_checkouts,write_payment_gateways,write_payment_sessions"
+
+[auth]
+redirect_urls = [
+  "https://latori-17.ngrok.io/auth/callback",
+  "https://latori-17.ngrok.io/auth/shopify/callback",
+  "https://latori-17.ngrok.io/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2024-07"
+
+[pos]
+embedded = false

@@ -1,0 +1,7 @@
+-- AlterTable
+ALTER TABLE "UnzerCharge" ALTER COLUMN "redirectUrl" DROP NOT NULL,
+ALTER COLUMN "message" DROP NOT NULL,
+ALTER COLUMN "resources" DROP NOT NULL,
+ALTER COLUMN "invoiceId" DROP NOT NULL,
+ALTER COLUMN "paymentReference" DROP NOT NULL,
+ALTER COLUMN "processing" DROP NOT NULL;

@@ -1,0 +1,201 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id            String         @id
+  shop          String
+  state         String
+  isOnline      Boolean        @default(false)
+  scope         String?
+  expires       DateTime?
+  accessToken   String
+  userId        BigInt?
+  Configuration Configuration?
+}
+
+model Configuration {
+  id                   Int     @id @default(autoincrement())
+  session              Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sessionId            String  @unique
+  shop                 String
+  accountName          String
+  unzerPublicKey       String
+  unzerPrivateKey      String
+  paymentPageSettings  String?
+  excludedPaymentTypes String?
+  ready                Boolean @default(true)
+
+  @@index([sessionId])
+}
+
+model PaymentSession {
+  id                String           @id
+  pid               String?
+  gid               String
+  group             String
+  amount            Decimal
+  test              Boolean
+  currency          String
+  kind              String
+  shop              String
+  paymentMethod     String
+  customer          String
+  cancelUrl         String
+  refunds           RefundSession[]
+  captures          CaptureSession[]
+  charges           UnzerCharge[]
+  cancels           UnzerCancel[]
+  authorizations    UnzerAuthorize[]
+  void              VoidSession?
+  logs              PaymentLog[]
+  proposedAt        DateTime
+  status            String?
+  checkoutCartToken String
+  publicKey         String?
+}
+
+model UnzerCharge {
+  id               Int            @id @default(autoincrement())
+  chargeId         String
+  payment          PaymentSession @relation(fields: [paymentId], references: [id])
+  paymentId        String
+  isSuccess        Boolean
+  isPending        Boolean
+  isResumed        Boolean
+  isError          Boolean
+  card3ds          Boolean
+  redirectUrl      String?
+  message          String?
+  amount           Decimal
+  currency         String
+  date             DateTime
+  resources        String?
+  invoiceId        String?
+  paymentReference String?
+  processing       String?
+}
+
+model UnzerAuthorize {
+  id               Int            @id @default(autoincrement())
+  authorizeId      String
+  payment          PaymentSession @relation(fields: [paymentId], references: [id])
+  paymentId        String
+  isSuccess        Boolean
+  isPending        Boolean
+  isResumed        Boolean
+  isError          Boolean
+  card3ds          Boolean
+  redirectUrl      String?
+  message          String?
+  amount           Decimal
+  currency         String
+  date             DateTime
+  resources        String?
+  invoiceId        String?
+  paymentReference String?
+  processing       String?
+}
+
+model UnzerCancel {
+  id               Int               @id @default(autoincrement())
+  cancelId         String
+  chargeId         String
+  status           UnzerCancelStatus @default(PENDING)
+  payment          PaymentSession    @relation(fields: [paymentId], references: [id])
+  paymentId        String
+  refund           RefundSession?    @relation(fields: [refundId], references: [id])
+  refundId         String?
+  void             VoidSession?      @relation(fields: [voidId], references: [id])
+  voidId           String?
+  isSuccess        Boolean?
+  isPending        Boolean?
+  isResumed        Boolean?
+  isError          Boolean?
+  card3ds          Boolean?
+  redirectUrl      String?
+  message          String?
+  amount           Decimal?
+  currency         String?
+  date             DateTime?
+  resources        String?
+  invoiceId        String?
+  paymentReference String?
+  processing       String?
+}
+
+model RefundSession {
+  id          String         @id
+  gid         String
+  payment     PaymentSession @relation(fields: [paymentId], references: [id])
+  paymentId   String
+  amount      Decimal
+  currency    String
+  proposedAt  DateTime
+  status      String?
+  unzerRefund UnzerCancel[]
+}
+
+model CaptureSession {
+  id             String         @id
+  gid            String
+  payment        PaymentSession @relation(fields: [paymentId], references: [id])
+  paymentId      String
+  amount         Decimal
+  currency       String
+  proposedAt     DateTime
+  status         String?
+  processingData String?
+}
+
+model VoidSession {
+  id         String         @id
+  gid        String
+  payment    PaymentSession @relation(fields: [paymentId], references: [id])
+  paymentId  String         @unique
+  proposedAt DateTime
+  status     String?
+  unzerVoid  UnzerCancel[]
+}
+
+model Checkout {
+  id                  String  @id
+  lines               String
+  totalPrice          Decimal
+  subtotalPrice       Decimal
+  totalLineItemsPrice Decimal
+  totalTax            Decimal
+  totalDuties         Decimal
+  currency            String
+}
+
+model PaymentLog {
+  id        Int            @id @default(autoincrement())
+  payment   PaymentSession @relation(fields: [paymentId], references: [id])
+  paymentId String
+  createdAt DateTime       @default(now())
+  type      LogMessageType @default(INFO)
+  prefix    String
+  message   String
+  payload   String?
+}
+
+enum LogMessageType {
+  INFO
+  DEBUG
+  WARN
+  ERROR
+}
+
+enum UnzerCancelStatus {
+  PENDING
+  RESOLVED
+}
