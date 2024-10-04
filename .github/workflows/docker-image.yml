@@ -1,0 +1,88 @@
+#### Author: Arunkumar Krishnakumar #########
+### Please Add new images in the version_tag whenever u create a new Base image
+
+name: IMAGE BUILD
+concurrency: build
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_tag:
+        description: Enter the image tag like (postgres:13.0)
+        required: true
+        type: string
+  
+      platform:
+        description: Please choose the image platform
+        required: true
+        type: choice
+        options:
+        - linux/amd64
+        - linux/arm64
+        - linux/arm/v7
+        - linux/arm/v6
+        - linux/386
+        - linux/mips64
+        - linux/riscv64
+        - linux/ppc64le
+        - linux/s390x
+        - linux/mips64le
+
+
+permissions:
+    contents: 'write'
+    id-token: 'write'
+    pull-requests: write
+    issues: write
+        
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+
+    steps:
+
+      - uses: actions/checkout@v3
+
+  ### Build and push the docker image ####
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+    ### AWS Auth #########
+      - id: oidc
+        name: Get OIDC token
+        run: echo "token=$(aws sts get-caller-identity --query 'Token' --output text --region eu-central-1)" >> $GITHUB_ENV
+
+    ### AWS Auth #########
+      - id: auth-aws
+        name: ⬆ Configure AWS credentials ⬆
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+           aws-region: eu-central-1
+           role-to-assume: ${{ env.ROLE }}
+                  #control duration of the role/token validity - 30 minutes - we can shorten it per need
+           role-duration-seconds: 1800
+           role-session-name: GitHubActions
+           audience: sts.amazonaws.com
+                  #variable in the GitHub Actions workflow is used to pass the OIDC token obtained from the AWS Security Token Service (STS) to the aws-actions/configure-aws-credentials action
+           web-identity-token-file: ${{ steps.oidc.outputs.token }}
+      
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+      
+      - name: ⬆️Docker Build and Push To ECR ⬆️
+        uses: docker/build-push-action@v5
+        with:
+          provenance: false
+          context: local-docker/Dockerfile
+          platforms: ${{ inputs.platform }}
+          push: true
+          tags: ${{ inputs.version_tag }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
