@@ -1,7 +1,7 @@
 #### Author: Arunkumar Krishnakumar #########
 ### Please Add new images in the version_tag whenever u create a new Base image
 
-name: IMAGE BUILD
+name: DOCKER IMAGE BUILD
 concurrency: build
 
 on:
@@ -39,7 +39,10 @@ jobs:
 
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: unzer-dev-org-runner 
+    env:
+      ROLE: arn:aws:iam::437291019013:role/unzer-aws-shared-core-shopify-ghaction-ecr-iam-role
+
 
 
     steps:
@@ -80,7 +83,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           provenance: false
-          context: local-docker/Dockerfile
+          context: ./Dockerfile
           platforms: ${{ inputs.platform }}
           push: true
           tags: ${{ inputs.version_tag }}
