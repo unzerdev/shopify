@@ -39,7 +39,7 @@ jobs:
 
   build:
 
-    runs-on: ubunutu-latest
+    runs-on: ubuntu-latest
     env:
       ROLE: arn:aws:iam::437291019013:role/unzer-aws-shared-core-shopify-ghaction-ecr-iam-role
 
