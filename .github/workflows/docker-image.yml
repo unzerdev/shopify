@@ -83,7 +83,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           provenance: false
-          context: Dockerfile
+          context: ./
           platforms: ${{ inputs.platform }}
           push: true
           tags: ${{ inputs.version_tag }}
