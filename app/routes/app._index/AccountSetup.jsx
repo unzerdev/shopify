@@ -9,11 +9,8 @@ export default function AccountSetup() {
   const { config } = useLoaderData();
   const { t } = useTranslation();
 
-  const [accountName, setAccountName] = useState(
-    config ? config.accountName : ""
-  );
   const [unzerPrivateKey, setUnzerPrivateKey] = useState(
-    config ? config.unzerPrivateKey : ""
+    config?.unzerPrivateKey || ""
   );
 
   return (
@@ -25,13 +22,6 @@ export default function AccountSetup() {
       <Form method="post">
         <input type="hidden" name="_action" value="update-account" />
         <FormLayout>
-          <TextField
-            label={t("account_setup.account_name")}
-            name="accountName"
-            onChange={(change) => setAccountName(change)}
-            value={accountName}
-            autoComplete="off"
-          />
           <TextField
             label={t("account_setup.private_key")}
             name="unzerPrivateKey"

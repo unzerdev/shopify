@@ -7,7 +7,7 @@ import {
   Button,
   Modal,
 } from "@shopify/polaris";
-import { useFetcher, useLoaderData, useSubmit } from "@remix-run/react";
+import { useFetcher, useLoaderData } from "@remix-run/react";
 import { useEffect, useState } from "react";
 
 export const ProcessingData = () => {

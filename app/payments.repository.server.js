@@ -236,12 +236,12 @@ export const updateVoidSessionStatus = async (id, status) => {
  * @property {string} termsAndConditionUrl
  * @property {string} privacyPolicyUrl
  * @property {string} imprintUrl
+ * @property {string} locale
  *
  * @typedef ConfigurationData
  * @property {import('@prisma/client').Configuration["id"]} id
  * @property {import('@prisma/client').Configuration["sessionId"]} sessionId
  * @property {import('@prisma/client').Configuration["shop"]} shop
- * @property {import('@prisma/client').Configuration["accountName"]} accountName
  * @property {import('@prisma/client').Configuration["unzerPublicKey"] | null} unzerPublicKey
  * @property {import('@prisma/client').Configuration["unzerPrivateKey"] | null} unzerPrivateKey
  * @property {import('@prisma/client').Configuration["ready"]} ready

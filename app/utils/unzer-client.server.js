@@ -342,7 +342,7 @@ export default class UnzerClient {
   /**
    * Gets all webhooks registered with the keypair
    *
-   * @returns {Promise<Array[*]>}
+   * @returns {Promise<AllWebhooksData>}
    */
   async getAllWebhooks() {
     log("Fetching Webhooks");
@@ -365,6 +365,27 @@ export default class UnzerClient {
       url,
       event,
     });
+    const data = await response.json();
+
+    if (data.isError) {
+      log("Error creating Webhook");
+      (data.errors || []).forEach((error) => log(error.merchantMessage));
+
+      throw new Error("Error creating Webhook");
+    }
+
+    return data;
+  }
+
+  /**
+   * Delete a webhook resource.
+   *
+   * @param {string} eventId - The eventId to be updated.
+   */
+  async deleteWebhook(eventId) {
+    log("Deleting Webhook");
+
+    const response = await this.#callApi(`${API_URL}/v1/webhooks/${eventId}`, "DELETE");
     const data = await response.json();
 
     if (data.isError) {
@@ -411,7 +432,7 @@ export default class UnzerClient {
    * Makes a request to Unzer API
    *
    * @param {string} url
-   * @param {"GET" | "POST"} [method="POST"]
+   * @param {"GET" | "POST" | "DELETE"} [method="POST"]
    * @param {object} [body]
    *
    * @returns Promise<Response>
@@ -567,6 +588,16 @@ export default class UnzerClient {
  * @property {string} [unit] - The unit description of the item.
  * @property {string} [subTitle] - The subTitle which is displayed on our Payment Page.
  * @property {string} [imageUrl] - The imageUrl for the related basketItem which will be displayed on our Payment Page.
+ */
+
+/**
+ * @typedef {Object} WebhookEventData
+ * @property {string} id - Describe the webhook eventId which will be returned from server)
+ * @property {string} url - Declared merchant's api.
+ * @property {string} event - Declared event that want to listen
+ * 
+ * @typedef {Object} AllWebhooksData
+ * @property {WebhookEventData[]} events
  */
 
 /**

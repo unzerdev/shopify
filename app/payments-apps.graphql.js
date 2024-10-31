@@ -178,7 +178,7 @@ export default class PaymentsAppsClient {
       externalHandle,
       ready,
     });
-
+    
     return response?.paymentsAppConfigure;
   }
 

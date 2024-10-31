@@ -107,6 +107,12 @@ export const loader = async ({ request, params: { paymentId } }) => {
     const session = (
       await sessionStorage.findSessionsByShop(paymentSession.shop)
     )[0];
+
+    if (session.accessToken === undefined) {
+      log(`No Access Token found for this Store: ${session.shop}`);
+      return new Response("Server error", { status: 500 });
+    }
+
     const client = new PaymentsAppsClient(
       session.shop,
       session.accessToken,
@@ -177,12 +183,21 @@ export const loader = async ({ request, params: { paymentId } }) => {
       paymentSession.kind === PaymentKind.SALE
         ? PayPageAction.CHARGE
         : PayPageAction.AUTHORIZE;
+    const { locale, paymentPageSettings } = (() => {
+      if (config.paymentPageSettings === null)
+        return { locale: "en-GB", paymentPageSettings: {} };
+
+      const { locale, ...paymentPageSettings } = config.paymentPageSettings;
+      return { locale, paymentPageSettings };
+    })();
+
+    config.paymentPageSettings !== null ? config.paymentPageSettings : {};
     const paymentPage = await unzerClient.createPayPage(action, {
       amount: totalPrice.toNumber(),
       currency,
       returnUrl: `${url.origin}/app/processing/${paymentId}`,
       excludeTypes: [...excludePaymentTypes, ...config.excludedPaymentTypes],
-      ...(config?.paymentPageSettings ? config.paymentPageSettings : {}),
+      ...paymentPageSettings,
     });
 
     paymentLog({
@@ -213,7 +228,12 @@ export const loader = async ({ request, params: { paymentId } }) => {
       payload: JSON.stringify(paymentPage),
     });
 
-    return redirect(paymentPage.redirectUrl);
+    const searchParams = new URLSearchParams();
+    if (locale) {
+      searchParams.append("locale", locale);
+    }
+
+    return redirect(`${paymentPage.redirectUrl}?${searchParams.toString()}`);
   } catch (e) {
     let message = "Error processing payment";
 

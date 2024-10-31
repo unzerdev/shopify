@@ -81,11 +81,13 @@ export const action = async ({ request }) => {
 
   switch (_action) {
     case "update-account":
-      return updateAcount(session, formData);
-    case "update-payment-page":
-      return updatePaymentPage(session, formData);
+      return updateAcount(session, request, formData);
     case "install-webhook":
       return installWebhook(session, request);
+    case "uninstall-webhook":
+      return uninstallWebhook(session, request);
+    case "update-payment-page":
+      return updatePaymentPage(session, request, formData);
     case "update-excluded-payment-types":
       return handleUpdateExcludedPaymentTypes(session, formData);
     default:
@@ -198,12 +200,11 @@ export default function Index() {
   );
 }
 
-async function updateAcount(session, formData) {
+async function updateAcount(session, request, formData) {
   log("Updating account");
 
   const config = {
     shop: session.shop,
-    accountName: formData.get("accountName"),
   };
 
   const unzerPrivateKey = formData.get("unzerPrivateKey");
@@ -227,13 +228,13 @@ async function updateAcount(session, formData) {
   }
 
   log("Updating Account Configuration");
-  const configuration = await getOrCreateConfiguration(session.id, {
+  await getOrCreateConfiguration(session.id, {
     ...config,
     unzerPublicKey: data?.publicKey || "",
     unzerPrivateKey: data?.publicKey ? unzerPrivateKey : "",
   });
 
-  await updateReadyState(session, configuration);
+  await updateReadyState(session, request);
 
   return json({
     /** @type {ActionMessage} */
@@ -248,10 +249,11 @@ async function updateAcount(session, formData) {
  * Updates Settings for the Payment Page
  *
  * @param {*} session
+ * @param {Request} request
  * @param {*} formData
  * @returns
  */
-async function updatePaymentPage(session, formData) {
+async function updatePaymentPage(session, request, formData) {
   log("Updating Payment Page configuration");
 
   const {
@@ -265,6 +267,7 @@ async function updatePaymentPage(session, formData) {
     imprintUrl,
     helpUrl,
     contactUrl,
+    locale,
   } = Object.fromEntries(formData);
 
   try {
@@ -279,6 +282,7 @@ async function updatePaymentPage(session, formData) {
       imprintUrl,
       helpUrl,
       contactUrl,
+      locale,
     });
 
     log("Payment Page settings updated successfully");
@@ -319,7 +323,16 @@ async function installWebhook(session, request) {
     const unzerClient = new UnzerClient(configuration.unzerPrivateKey);
     await unzerClient.createWebhook(createNotificationsUrl(request));
 
-    return json({ raiseBanner: true });
+    await updateReadyState(session, request);
+
+    log("Webhook installed successfully");
+    return json({
+      /** @type {ActionMessage} */
+      successMessage: {
+        message: "Webhook installed successfully",
+        messageSlug: "success.webhook_installed",
+      },
+    });
   } catch (e) {
     const error = (() => {
       if (e instanceof Error) {
@@ -331,6 +344,62 @@ async function installWebhook(session, request) {
       return {
         message: "Webhook could not be installed",
         messageSlug: "errors.webhook_install",
+      };
+    })();
+
+    return json({
+      /** @type {ActionMessage[]} */
+      errors: [error],
+    });
+  }
+}
+
+async function uninstallWebhook(session, request) {
+  log("Uninstalling Webhook");
+  const configuration = await getConfigurationByShopName(session.shop);
+
+  if (configuration === null) {
+    log("No Configuration Found");
+    throw new Response("No Configuration Found", { status: 422 });
+  } else if (configuration.unzerPrivateKey === null) {
+    log("No Private Key Found");
+    throw new Response("No Private Key Found", { status: 422 });
+  }
+
+  try {
+    const notificationsUrl = createNotificationsUrl(request);
+    const unzerClient = new UnzerClient(configuration.unzerPrivateKey);
+    const allWebhooks = await unzerClient.getAllWebhooks();
+    const eventId = allWebhooks.events.find(
+      (event) => event.url === notificationsUrl
+    )?.id;
+
+    if (eventId === undefined) {
+      throw new Error("Webhook could not be uninstalled");
+    }
+
+    await unzerClient.deleteWebhook(eventId);
+    await updateReadyState(session, request);
+
+    log("Webhook uninstalled successfully");
+    return json({
+      /** @type {ActionMessage} */
+      successMessage: {
+        message: "Webhook uninstalled successfully",
+        messageSlug: "success.webhook_uninstalled",
+      },
+    });
+  } catch (e) {
+    const error = (() => {
+      if (e instanceof Error) {
+        return {
+          message: e.message,
+        };
+      }
+
+      return {
+        message: "Webhook could not be uninstalled",
+        messageSlug: "errors.webhook_uninstall",
       };
     })();
 
@@ -382,21 +451,39 @@ async function handleUpdateExcludedPaymentTypes(session, formData) {
 /**
  *
  * @param {*} session
- * @param {import('~/payments.repository.server').ConfigurationData} configuration
+ * @param {Request} request
  */
-async function updateReadyState(session, configuration) {
+async function updateReadyState(session, request) {
   log("Updating Ready state");
 
-  const ready =
-    configuration.accountName !== "" && configuration.unzerPrivateKey !== null;
+  const configuration = await getConfigurationByShopName(session.shop);
 
+  if (configuration === null) {
+    log("No Configuration Found");
+    throw new Response("No Configuration Found", { status: 422 });
+  }
+
+  const ready = await (async () => {
+    if (configuration.unzerPrivateKey === null) return false;
+
+    const unzerClient = new UnzerClient(configuration.unzerPrivateKey);
+    const webhooks = await unzerClient.getAllWebhooks();
+
+    const notificationsUrl = createNotificationsUrl(request);
+    const webhookInstalled = findAppWebhook(
+      webhooks.events || [],
+      notificationsUrl
+    );
+    if (!webhookInstalled) return false;
+
+    return true;
+  })();
+
+  log(`App Ready state set to: ${ready}`);
   const client = new PaymentsAppsClient(session.shop, session.accessToken);
-  const response = await client.paymentsAppConfigure(
-    configuration.accountName,
-    ready
-  );
+  const response = await client.paymentsAppConfigure("unzer-payments", ready);
 
-  await updateReadyStatus(configuration.sessionId, Boolean(response));
+  await updateReadyStatus(configuration.sessionId, ready && Boolean(response));
 }
 
 /**

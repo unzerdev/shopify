@@ -10,6 +10,7 @@ import {
   InlineGrid,
   Divider,
   Grid,
+  Select,
 } from "@shopify/polaris";
 import { ImageIcon } from "@shopify/polaris-icons";
 import { useTranslation } from "react-i18next";
@@ -36,6 +37,7 @@ export default function PaymentPageSettings() {
       imprintUrl: "",
       helpUrl: "",
       contactUrl: "",
+      locale: "en-GB",
     };
 
     if (config === null || config.paymentPageSettings === null)
@@ -43,6 +45,8 @@ export default function PaymentPageSettings() {
 
     return config.paymentPageSettings;
   });
+
+  console.log('settings', settings);
 
   const handleUpdateSettings = (key, value) => {
     setSettings((oldSettings) => ({
@@ -196,6 +200,23 @@ export default function PaymentPageSettings() {
               autoComplete="off"
             />
           </InlineGrid>
+          <Divider borderColor="border" />
+          <Select
+            label="Language"
+            name="locale"
+            options={[
+              {
+                label: "English",
+                value: "en-GB",
+              },
+              {
+                label: "Deutsch",
+                value: "de-DE",
+              },
+            ]}
+            onChange={(value) => handleUpdateSettings("locale", value)}
+            value={settings.locale}
+          />
 
           <Button variant="primary" submit>
             {t("update")}

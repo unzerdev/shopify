@@ -27,7 +27,6 @@ model Configuration {
   session              Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   sessionId            String  @unique
   shop                 String
-  accountName          String
   unzerPublicKey       String
   unzerPrivateKey      String
   paymentPageSettings  String?
