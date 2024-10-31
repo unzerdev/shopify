@@ -1,14 +1,14 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "a493179fa98807e98a3cba88bf885659"
-name = "Unzer Payment SBX"
-handle = "unzer-payment-sbx"
-application_url = "https://latori-17.ngrok.io"
+client_id = "154a51d0aa303d265ddf1bad7f960aec"
+name = "Unzer Payments SBX"
+handle = "unzer-payments-sbx"
+application_url = "https://connectivity.int.unzer.io/"
 embedded = true
 
 [build]
 automatically_update_urls_on_dev = false
-dev_store_url = "unzer-latori-dev-store.myshopify.com"
+dev_store_url = "unzer-development.myshopify.com"
 include_config_on_deploy = true
 
 [access_scopes]
@@ -17,13 +17,17 @@ scopes = "read_orders,unauthenticated_read_checkouts,write_payment_gateways,writ
 
 [auth]
 redirect_urls = [
-  "https://latori-17.ngrok.io/auth/callback",
-  "https://latori-17.ngrok.io/auth/shopify/callback",
-  "https://latori-17.ngrok.io/api/auth/callback"
+  "https://connectivity.int.unzer.io/auth/callback",
+  "https://connectivity.int.unzer.io/auth/shopify/callback",
+  "https://connectivity.int.unzer.io/api/auth/callback"
 ]
 
 [webhooks]
 api_version = "2024-07"
+
+  [[webhooks.subscriptions]]
+  uri = "https://connectivity-shopify.int.unzer.io/webhooks"
+  compliance_topics = [ "customers/data_request", "customers/redact", "shop/redact" ]
 
 [pos]
 embedded = false
