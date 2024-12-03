@@ -6,7 +6,7 @@
     "predev": "prisma generate && prisma migrate deploy",
     "dev": "shopify app dev --tunnel-url=https://latori-17.ngrok.io:3000",
     "config:link": "shopify app config link",
-    "config:push": "shopify app config push",
+    "config:push": "shopify app deploy",
     "config:reset": "shopify app config use --reset",
     "generate": "shopify app generate",
     "deploy": "shopify app deploy",

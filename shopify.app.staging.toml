@@ -3,7 +3,7 @@
 client_id = "154a51d0aa303d265ddf1bad7f960aec"
 name = "Unzer Payments SBX"
 handle = "unzer-payments-sbx"
-application_url = "https://connectivity.int.unzer.io/"
+application_url = "https://plugin-1.test.unzer.com"
 embedded = true
 
 [build]
@@ -17,16 +17,16 @@ scopes = "read_orders,unauthenticated_read_checkouts,write_payment_gateways,writ
 
 [auth]
 redirect_urls = [
-  "https://connectivity.int.unzer.io/auth/callback",
-  "https://connectivity.int.unzer.io/auth/shopify/callback",
-  "https://connectivity.int.unzer.io/api/auth/callback"
+  "https://plugin-1.test.unzer.com/auth/callback",
+  "https://plugin-1.test.unzer.com/auth/shopify/callback",
+  "https://plugin-1.test.unzer.com/api/auth/callback"
 ]
 
 [webhooks]
 api_version = "2024-07"
 
   [[webhooks.subscriptions]]
-  uri = "https://connectivity-shopify.int.unzer.io/webhooks"
+  uri = "/webhooks"
   compliance_topics = [ "customers/data_request", "customers/redact", "shop/redact" ]
 
 [pos]
