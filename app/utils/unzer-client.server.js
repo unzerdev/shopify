@@ -69,7 +69,7 @@ export default class UnzerClient {
    * @param {string} [payload.orderId] - The unique orderId to identify payments.
    * @param {string} [payload.invoiceId] - The unique invoiceId.
    * @param {string} [payload.paymentReference] - An additional description for the transaction
-   * 
+   *
    * @returns Promise<any>
    */
   async chargeAuthorized(paymentId, payload) {
@@ -130,7 +130,7 @@ export default class UnzerClient {
    * @param {string} [payload.amountGross] - Only valid for installment secured: The amount gross to be cancelled.
    * @param {string} [payload.amountNet] - Only valid for installment secured: The amount net to be cancelled.
    * @param {string} [payload.amountVat] - Only valid for installment secured: The amount vat to be cancelled.
-   * 
+   *
    * @returns {Promise<CancelChargeResponse>}
    */
   async cancel(paymentId, chargeId, payload) {
@@ -209,7 +209,11 @@ export default class UnzerClient {
   async createBasket(payload) {
     log("Creating Basket");
 
-    const response = await this.#callApi(`${API_URL}/v2/baskets`, "POST", payload);
+    const response = await this.#callApi(
+      `${API_URL}/v2/baskets`,
+      "POST",
+      payload
+    );
     const data = await response.json();
 
     if (data.isError) {
@@ -234,9 +238,7 @@ export default class UnzerClient {
   async getBasket(basketId) {
     log("Fetching Basket Data");
 
-    const response = await this.#callApi(
-      `${API_URL}/v2/baskets/${basketId}`
-    );
+    const response = await this.#callApi(`${API_URL}/v2/baskets/${basketId}`);
     const data = await response.json();
 
     return data;
@@ -260,7 +262,11 @@ export default class UnzerClient {
       this.customerResourceId = customer.id;
     } else {
       log("Creating new Customer");
-      const response = await this.#callApi(`${API_URL}/v1/customers`, "POST", payload);
+      const response = await this.#callApi(
+        `${API_URL}/v1/customers`,
+        "POST",
+        payload
+      );
       const data = await response.json();
 
       if (data.isError) {
@@ -276,6 +282,53 @@ export default class UnzerClient {
   }
 
   /**
+   * Creates a metadata resource, and then adds the ID to the client to be
+   * used in future requests.
+   * Docs: https://api.unzer.com/api-reference/index.html#tag/Customer/operation/createCustomer_1
+   *
+   * @param {string} shopifyApiVersion - The API version used when creating the resource
+   *
+   * @returns Promise<void>
+   */
+  async createMetadata(shopifyApiVersion) {
+    log("Creating Metadata resource");
+    const response = await this.#callApi(`${API_URL}/v1/metadata`, "POST", {
+      shopType: "Shopify",
+      shopVersion: shopifyApiVersion,
+      pluginVersion: "1.0.0",
+      pluginType: "unzerdev/shopify",
+    });
+    const data = await response.json();
+
+    if (data.isError) {
+      log("Error creating Metadata resource");
+      (data.errors || []).forEach((error) => log(error.merchantMessage));
+
+      throw new Error("Error creating Customer");
+    }
+
+    log("Metadata Created created");
+    this.metadataResourceId = data.id;
+  }
+
+  /**
+   * Get a metadata resource.
+   * @see https://api.unzer.com/api-reference/index.html#tag/Metadata/operation/getMetadata
+   *
+   * @param {string} metadataId - The previously created metadataId.
+   *
+   * @returns Promise<any>
+   */
+  async getMetadata(metadataId) {
+    log("Fetching Metadata Data");
+
+    const response = await this.#callApi(`${API_URL}/v1/metadata/${metadataId}`);
+    const data = await response.json();
+
+    return data;
+  }
+
+  /**
    * Creates a PayPage.
    *
    * Docs:
@@ -284,7 +337,7 @@ export default class UnzerClient {
    *
    * @param {PayPageAction} action - The type of action
    * @param {PayPagePayload} payload
-   * 
+   *
    * @returns {Promise<PayPageData>}
    */
   async createPayPage(action, payload) {
@@ -301,6 +354,10 @@ export default class UnzerClient {
       requestBody.resources.basketId = this.basketResourceId;
     }
 
+    if (this.metadataResourceId) {
+      requestBody.resources.metadataId = this.metadataResourceId;
+    }
+
     const response = await this.#callApi(
       `${API_URL}/v1/paypage/${action}`,
       "POST",
@@ -310,7 +367,7 @@ export default class UnzerClient {
     /** @type {PayPageData | ErrorData} */
     const data = await response.json();
 
-    if ('isError' in data) {
+    if ("isError" in data) {
       log("Error creating Payment Page");
       (data.errors || []).forEach((error) => log(error.merchantMessage));
 
@@ -326,14 +383,12 @@ export default class UnzerClient {
    * Get a payment using a unique paymentId
    *
    * @param {string} paymentId - A unique paymentId
-   * 
+   *
    * @return {Promise<PaymentData>}
    */
   async getPayment(paymentId) {
     log("Fetching Payment status");
-    const response = await this.#callApi(
-      `${API_URL}/v1/payments/${paymentId}`
-    );
+    const response = await this.#callApi(`${API_URL}/v1/payments/${paymentId}`);
     const data = await response.json();
 
     return data;
@@ -385,7 +440,10 @@ export default class UnzerClient {
   async deleteWebhook(eventId) {
     log("Deleting Webhook");
 
-    const response = await this.#callApi(`${API_URL}/v1/webhooks/${eventId}`, "DELETE");
+    const response = await this.#callApi(
+      `${API_URL}/v1/webhooks/${eventId}`,
+      "DELETE"
+    );
     const data = await response.json();
 
     if (data.isError) {
@@ -401,7 +459,7 @@ export default class UnzerClient {
   /**
    * Makes a GET request to Unzer API to retrieve account information
    * Provides the public key of the used private key as well as a list of the payment types available for the merchant.
-   * 
+   *
    * @returns {Promise<KeypairData | ErrorData>}
    */
   async keypair() {
@@ -415,14 +473,12 @@ export default class UnzerClient {
   /**
    * Provides the public key of the used private key as well as a detailed list of the payment types available for the merchant.
    * Docs: https://api.unzer.com/api-reference/index.html#tag/Keypair/operation/getAvailablePaymentMethodTypesWithTypeInformation
-   * 
+   *
    * @returns {Promise<AvailablePaymentMethodTypesData>}
    */
   async getAvailablePaymentMethodTypes() {
     log("Fetching Available Payment Types");
-    const response = await this.#callApi(
-      `${API_URL}/v1/keypair/types`
-    );
+    const response = await this.#callApi(`${API_URL}/v1/keypair/types`);
     const data = await response.json();
 
     return data;
@@ -456,7 +512,7 @@ export default class UnzerClient {
  * @typedef {Object} KeypairData
  * @property {string} publicKey
  * @property {string[]} availablePaymentTypes
- * 
+ *
  * @typedef {Object} Transaction
  * @property {string} participantId
  * @property {string} date
@@ -464,7 +520,7 @@ export default class UnzerClient {
  * @property {string} status
  * @property {string} url
  * @property {string} amount
- * 
+ *
  * @typedef {Object} PaymentData
  * @property {string} id - The id of payment (ex: s-pay-1).
  * @property {Object} state
@@ -480,7 +536,7 @@ export default class UnzerClient {
  * @property {string} invoiceId - InvoiceId of the merchant.
  * @property {string} invoiceId - InvoiceId of the merchant.
  * @property {Object} resources
- * @property {string} resources.customerId - Customer id used for this transaction. 
+ * @property {string} resources.customerId - Customer id used for this transaction.
  * @property {string} resources.paymentId - Id of the payment.
  * @property {string} resources.basketId - Basket ID used for this transaction.
  * @property {string} resources.metadataId - Meta data ID used for this transaction.
@@ -511,7 +567,7 @@ export default class UnzerClient {
  * @property {string} allowCustomerTypes
  * @property {string} googleMerchantId
  * @property {boolean} allowCreditTransaction
- * 
+ *
  * @typedef {Object} AvailablePaymentMethodTypesData
  * @property {string} publicKey
  * @property {string} privateKey
@@ -562,11 +618,11 @@ export default class UnzerClient {
  * @property {string} email - The email address of the customer.
  * @property {string} [phone] - The phone number of the customer. This can be either mobile number or a landline number with country code.
  * @property {string} [mobile] - The mobile number of the customer.
- * @property {string} [language] - he language of the customer. Must be a ISO 639 alpha-2 code 
+ * @property {string} [language] - he language of the customer. Must be a ISO 639 alpha-2 code
  * @property {Address} [billingAddress] - The Billing Address of the customer
  * @property {Address} [shippingAddress] - The Billing Address of the customer
  * @property {Object} [companyInfo] - Company details for the customer. This is required only for B2B customers.
- * 
+ *
  * @typedef {Object} Address
  * @property {string} name - Address first and last name (max. 81 chars). Required in case of billing address.
  * @property {string} street - Address street (max. 64 chars). Required in case of billing address.
@@ -595,7 +651,7 @@ export default class UnzerClient {
  * @property {string} id - Describe the webhook eventId which will be returned from server)
  * @property {string} url - Declared merchant's api.
  * @property {string} event - Declared event that want to listen
- * 
+ *
  * @typedef {Object} AllWebhooksData
  * @property {WebhookEventData[]} events
  */

@@ -105,7 +105,7 @@ export const action = async ({ request, params: { paymentId } }) => {
       payload = await unzerClient.getBasket(resourceId);
       break;
     case "get-metadata-data":
-      payload = resourceId;
+      payload = await unzerClient.getMetadata(resourceId);;
       break;
     default:
       throw new Response("Action not set");
