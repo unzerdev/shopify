@@ -179,6 +179,8 @@ export const loader = async ({ request, params: { paymentId } }) => {
       createCustomerHash(JSON.parse(paymentSession.customer))
     );
 
+    await unzerClient.createMetadata("2024-07");
+
     const action =
       paymentSession.kind === PaymentKind.SALE
         ? PayPageAction.CHARGE
