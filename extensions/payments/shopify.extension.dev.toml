@@ -1,14 +1,14 @@
 api_version = "2024-07"
 
 [[extensions]]
-name = "Unzer Payments"
+name = "paymentqp"
 type = "payments_extension"
-handle = "unzer-payments"
-payment_session_url = "https://plugin-1.test.unzer.com/app/payment_session"
-refund_session_url = "https://plugin-1.test.unzer.com/app/refund_session"
-capture_session_url = "https://plugin-1.test.unzer.com/app/capture_session"
-void_session_url = "https://plugin-1.test.unzer.com/app/void_session"
-merchant_label = "Unzer Payments"
+handle = "paymentqp"
+payment_session_url = "https://latori-17.ngrok.io/app/payment_session"
+refund_session_url = "https://latori-17.ngrok.io/app/refund_session"
+capture_session_url = "https://latori-17.ngrok.io/app/capture_session"
+void_session_url = "https://latori-17.ngrok.io/app/void_session"
+merchant_label = "QuickPayTesting"
 supported_countries = [
   "AX",
   "AL",
