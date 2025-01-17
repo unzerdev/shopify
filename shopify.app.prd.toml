@@ -1,0 +1,24 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "ed4a8b6013f91f2b4a04ccf2802d20a8"
+name = "Unzer Payments"
+handle = "unzer-payments-1"
+application_url = "https://plugin-1.unzer.com/"
+embedded = true
+
+[auth]
+redirect_urls = [
+  "https://plugin-1.unzer.com/auth/callback",
+  "https://plugin-1.unzer.com/auth/shopify/callback",
+  "https://plugin-1.unzer.com/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2024-10"
+
+  [[webhooks.subscriptions]]
+  uri = "/webhooks"
+  compliance_topics = [ "customers/data_request", "customers/redact", "shop/redact" ]
+
+[pos]
+embedded = false
