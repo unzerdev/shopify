@@ -3,7 +3,7 @@
 client_id = "ed4a8b6013f91f2b4a04ccf2802d20a8"
 name = "Unzer Payments"
 handle = "unzer-payments-1"
-application_url = "https://plugin-1.unzer.com/"
+application_url = "https://plugin-1.unzer.com"
 embedded = true
 
 [build]
