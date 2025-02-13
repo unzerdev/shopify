@@ -128,14 +128,6 @@ export const loader = async ({ request, params: { paymentId } }) => {
   }
 
   try {
-    log("Fetching Checkout session");
-    paymentLog({
-      paymentId: paymentId,
-      message: "Fetching Checkout session",
-      payload: JSON.stringify(paymentSession),
-      type: LogMessageType.DEBUG,
-    });
-
     await unzerClient.createCustomer(
       createCustomerHash(JSON.parse(paymentSession.customer))
     );

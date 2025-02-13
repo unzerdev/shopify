@@ -1,6 +1,5 @@
 import { authenticate } from "../shopify.server";
 import db from "../db.server";
-import { createOrUpdateCheckout } from "~/checkouts.server";
 import { createLogger } from "~/utils/lib";
 
 const { log } = createLogger("Webhooks");
