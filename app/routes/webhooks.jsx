@@ -26,11 +26,6 @@ export const action = async ({ request }) => {
         }
 
         break;
-      case "CHECKOUTS_CREATE":
-      case "CHECKOUTS_UPDATE":
-        await handleCheckoutCreateUpdate(payload);
-
-        break;
       case "CUSTOMERS_DATA_REQUEST":
         await handleCustomersDataRequest(/** @type {CustomersDataRequestPayload} */ (payload));
         break;
@@ -63,32 +58,6 @@ export const action = async ({ request }) => {
     throw new Response(errorMessage, { status });
   }
 };
-
-/**
- * Handles CHECKOUTS_CREATE and CHECKOUTS_UPDATE topics
- *
- * @see https://shopify.dev/docs/api/webhooks?reference=graphql#list-of-topics-checkouts_create
- * @see https://shopify.dev/docs/api/webhooks?reference=graphql#list-of-topics-checkouts_update
- *
- * @param {object} payload
- */
-async function handleCheckoutCreateUpdate(payload) {
-  if (!payload.line_items) {
-    throw new Response("Unprocessable Checkout", {
-      status: 422,
-      statusText: "Line Items missing for Checkout",
-    });
-  }
-
-  log("Creating or updating Checkout");
-  const checkout = await createOrUpdateCheckout(createCheckoutParams(payload));
-
-  if (!checkout) {
-    throw new Error("A Checkout couldn't be created or updated");
-  }
-
-  log("Successfully updated Checkout");
-}
 
 /**
  * Customers can request their data from a store owner. When this happens, Shopify sends a payload on the customers/data_request topic to the apps that are installed on that store.
@@ -152,31 +121,4 @@ async function handleCustomersRedact(payload) {
  */
 async function handleShopRedact(payload) {
 
-}
-
-/**
- * Maps Webhook payload into Checkout fields
- *
- * @returns {import("@prisma/client").Checkout}
- */
-function createCheckoutParams({
-  cart_token,
-  line_items,
-  total_price,
-  subtotal_price,
-  total_line_items_price,
-  total_tax,
-  total_duties,
-  presentment_currency,
-}) {
-  return {
-    id: cart_token,
-    lines: line_items,
-    totalPrice: total_price,
-    subtotalPrice: subtotal_price,
-    totalLineItemsPrice: total_line_items_price,
-    totalTax: total_tax,
-    totalDuties: total_duties,
-    currency: presentment_currency,
-  };
 }

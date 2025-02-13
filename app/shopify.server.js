@@ -24,14 +24,6 @@ const shopify = shopifyApp({
     APP_UNINSTALLED: {
       deliveryMethod: DeliveryMethod.Http,
       callbackUrl: "/webhooks",
-    },
-    CHECKOUTS_CREATE: {
-      deliveryMethod: DeliveryMethod.Http,
-      callbackUrl: "/webhooks"
-    },
-    CHECKOUTS_UPDATE: {
-      deliveryMethod: DeliveryMethod.Http,
-      callbackUrl: "/webhooks"
     }
   },
   hooks: {
