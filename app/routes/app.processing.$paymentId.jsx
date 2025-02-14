@@ -15,7 +15,6 @@ import {
   createLogger,
   createPaymentLogger,
 } from "~/utils/lib";
-import { getCheckout } from "~/checkouts.server";
 import { LogMessageType } from "@prisma/client";
 
 const { log } = createLogger("Processing");
@@ -129,52 +128,6 @@ export const loader = async ({ request, params: { paymentId } }) => {
   }
 
   try {
-    log("Fetching Checkout session");
-    paymentLog({
-      paymentId: paymentId,
-      message: "Fetching Checkout session",
-      payload: JSON.stringify(paymentSession),
-      type: LogMessageType.DEBUG,
-    });
-
-    const checkout = await getCheckout(paymentSession.checkoutCartToken);
-
-    if (checkout === null) {
-      log("Checkout not found");
-      paymentLog({
-        paymentId: paymentId,
-        message: "Checkout not found",
-        payload: JSON.stringify(paymentSession),
-        type: LogMessageType.ERROR,
-      });
-
-      throw new Response("Checkout session not found", { status: 500 });
-    }
-
-    log(`Checkout created`);
-    paymentLog({
-      paymentId: paymentId,
-      message: "Checkout created",
-      payload: JSON.stringify(checkout),
-    });
-
-    const {
-      id: checkoutId,
-      totalPrice,
-      totalLineItemsPrice,
-      currency,
-      lines,
-    } = checkout;
-
-    await unzerClient.createBasket(
-      createBasketHash({
-        amount: totalLineItemsPrice,
-        currency: currency,
-        id: checkoutId,
-        lines,
-      })
-    );
-
     await unzerClient.createCustomer(
       createCustomerHash(JSON.parse(paymentSession.customer))
     );
@@ -195,8 +148,8 @@ export const loader = async ({ request, params: { paymentId } }) => {
 
     config.paymentPageSettings !== null ? config.paymentPageSettings : {};
     const paymentPage = await unzerClient.createPayPage(action, {
-      amount: totalPrice.toNumber(),
-      currency,
+      amount: paymentSession.amount.toNumber(),
+      currency: paymentSession.currency,
       returnUrl: `${url.origin}/app/processing/${paymentId}`,
       excludeTypes: [...excludePaymentTypes, ...config.excludedPaymentTypes],
       ...paymentPageSettings,
@@ -290,43 +243,5 @@ function createCustomerHash({
       city: shipping_address.city,
       country: shipping_address.country_code,
     },
-  };
-}
-
-/**
- * Maps Shopify Checkout data into Basket payload data
- *
- * @param {object} checkoutData
- * @param {import("@prisma/client").Checkout["id"]} checkoutData.id
- * @param {import("@prisma/client").Checkout["totalLineItemsPrice"]} checkoutData.amount
- * @param {import("@prisma/client").Checkout["currency"]} checkoutData.currency
- * @param {import('~/checkouts.server').LineItem[]} checkoutData.lines
- *
- * @returns {import('~/utils/unzer-client.server').BasketData}
- */
-function createBasketHash({ id, amount, currency, lines }) {
-  const basketItems = lines.map(
-    ({ key, quantity, variant_price, title, tax_lines }) => {
-      /** @satisfies {import('~/utils/unzer-client.server').BasketItem} */
-      const basketItem = {
-        basketItemReferenceId: key.toString(),
-        quantity,
-        amountPerUnitGross: parseFloat(variant_price),
-        amountDiscountPerUnitGross: 0,
-        title,
-        vat: tax_lines
-          .reduce((acc, taxLine) => acc + taxLine.rate, 0)
-          .toString(),
-      };
-
-      return basketItem;
-    }
-  );
-
-  return {
-    totalValueGross: amount.toNumber(),
-    currencyCode: currency,
-    orderId: id,
-    basketItems,
   };
 }
