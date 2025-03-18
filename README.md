@@ -1,26 +1,31 @@
 # Unzer Shopify Payments App
 
-### Setup
+## Setup
 
 Following the instructions on `SETUP_DB.md` to configure
 Docker to use PostgreSQL.
 
-Install all dependencies:
+1. Install all dependencies:
 
 ```shell
 npm install
 ```
 
-Create a `.env` file in the root folder:
+2. Create a `.env` file in the root folder, using `.env.sample` as reference
 
-```
-SHOPIFY_API_KEY=833ee3d4c6a097b30dafcec45997cb0e
-SHOPIFY_PAYMENTQP_ID=d666e2e2-7844-48cd-a183-144c352455c5
-SHOPIFY_PAYMENTS_APP_API_VERSION=2024-07
-SHOPIFY_APP_URL=https://latori-17.ngrok.io/
-```
+### Environment Variables
 
-### Local Development
+Some of the settings for the app can be modified via the use of these Environment Variables.
+
+
+| Name                               | Description |
+| ---------------------------------- | ----------- |
+| `SHOPIFY_PAYMENTS_APP_API_VERSION` | This is the version of the API that the App uses. Shopify releases a new version quarterly, so it should be updated accordingly. More information about [Payments App API](https://shopify.dev/docs/api/payments-apps). |        
+|`SHOPIFY_APP_URL` | The URL the app is running on.\ The `@shopify/cli` provides this URL as `process.env.SHOPIFY_APP_URL`.  For development this is a tunnel URL that points to your local machine.  If this is a production app, this is your production URL. |
+| `UNZER_EXCLUDE_PAYMENT_TYPES` | Used to block some payments method from showing in the Setup Page and the Payments Page. It's a comma separated list of values, for example `paypal,giropay`. This is a global setting and will affect all merchants. |
+| `DATABASE_URL` | URL to make the connection to the Database. Check `SETUP_DB.md` for instructions on usage. |
+
+## Local Development
 
 Make sure that your local DB is running on Docker Desktop.
 
