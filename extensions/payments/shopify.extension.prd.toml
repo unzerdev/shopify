@@ -71,7 +71,7 @@ supported_countries = [
   "GB"
 ]
 # List of supported icons: https://github.com/activemerchant/payment_icons/blob/master/db/payment_icons.yml
-supported_payment_methods = [ "visa", "master", "american_express", "postfinance_card", "postfinance_efinance", "sepadirectdebit", "eps", "bancontact", "ideal", "przelewy24", "payu", "postfinance_card", "postfinance_efinance" ]
+supported_payment_methods = [ "visa", "master", "american_express", "diners_club", "sepadirectdebit", "eps", "ideal", "przelewy24", "payu", "postfinance_card", "postfinance_efinance" ]
 test_mode_available = true
 supports_3ds = true
 supports_deferred_payments = false
