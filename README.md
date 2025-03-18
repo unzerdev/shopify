@@ -39,7 +39,10 @@ npm run dev
 
 This project uses [example-app--payments-app-template--remix](https://github.com/Shopify/example-app--payments-app-template--remix) as a starting point. You can take a look at `README_TEMPLATE.md` for more information on how to use this template.
 
-## Links
+## Apps
+[Unzer Payments](https://partners.shopify.com/3965358/apps/194655453185/overview)\
+Production App. This is the app released publicly.
 
-[Development App](https://partners.shopify.com/5832/apps/6077021/overview)\
-[Development Store](https://admin.shopify.com/store/unzer-latori-dev-store)
+## Storefronts
+[Unzer Payments Demo](https://admin.shopify.com/store/unzer-payments-demo)\
+This is a demo test store that has the production app installed.
