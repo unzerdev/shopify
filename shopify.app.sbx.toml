@@ -1,8 +1,8 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "154a51d0aa303d265ddf1bad7f960aec"
-name = "Unzer Payments SBX"
-handle = "unzer-payments-sbx"
+client_id = "f7f5bc5afd6c65500d16efd3085ba65c"
+name = "SBX Secured Payments by Unzer"
+handle = "sbx-unzer-payments"
 application_url = "https://plugin-1.test.unzer.com/"
 embedded = true
 
@@ -13,7 +13,7 @@ include_config_on_deploy = true
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "read_orders,write_payment_gateways,write_payment_sessions"
+scopes = "write_payment_gateways,write_payment_sessions"
 
 [auth]
 redirect_urls = [
