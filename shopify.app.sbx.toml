@@ -3,7 +3,7 @@
 client_id = "f7f5bc5afd6c65500d16efd3085ba65c"
 name = "SBX Secured Payments by Unzer"
 handle = "sbx-unzer-payments"
-application_url = "https://plugin-1.test.unzer.com/"
+application_url = "https://plugin-1.test.unzer.com"
 embedded = true
 
 [build]
