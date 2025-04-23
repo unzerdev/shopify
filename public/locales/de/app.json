@@ -86,6 +86,8 @@
   "payment_type.prepayment": "Prepayment",
   "payment_type.wechatpay": "WeChat Pay",
   "payment_type.banktransfer": "Bank Transfer",
+  "payment_type.openbanking-pis": "Open Banking",
+  "payment_type.clicktopay": "Click to Pay",
   "success.banner_title": "Einstellungen aktualisiert!",
   "success.account_settings": "Ihre Kontoeinstellungen wurden aktualisiert",
   "success.payment_page_settings": "Einstellungen der Zahlungsseite erfolgreich aktualisiert",
