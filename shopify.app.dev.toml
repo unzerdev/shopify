@@ -1,14 +1,14 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "833ee3d4c6a097b30dafcec45997cb0e"
-name = "Unzer Development"
-handle = "qpdevbox"
+client_id = "86459dce818d8caf3cbd5989ee3c8dc7"
+name = "Latori dev app"
+handle = "latori-dev-app"
 application_url = "https://latori-17.ngrok.io"
 embedded = true
 
 [build]
 automatically_update_urls_on_dev = false
-dev_store_url = "unzer-latori-dev-store.myshopify.com"
+dev_store_url = "latori-dev-store.myshopify.com"
 include_config_on_deploy = true
 
 [access_scopes]
