@@ -363,22 +363,6 @@ export default class UnzerWebhookClient {
       message: "Received Payment Pending",
       payload: JSON.stringify(payload),
     });
-
-    const pendingSession = (
-      await sessionStorage.findSessionsByShop(paymentSession.shop)
-    )[0];
-
-    const pendingClient = new PaymentsAppsClient(
-      pendingSession.shop,
-      pendingSession.accessToken,
-      PAYMENT
-    );
-
-    await pendingClient.pendSession({
-      id: paymentSession.id,
-      kind: paymentSession.kind,
-      gid: paymentSession.gid,
-    });
   };
 
   /**
