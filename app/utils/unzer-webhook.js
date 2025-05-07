@@ -363,22 +363,6 @@ export default class UnzerWebhookClient {
       message: "Received Payment Pending",
       payload: JSON.stringify(payload),
     });
-
-    const pendingSession = (
-      await sessionStorage.findSessionsByShop(paymentSession.shop)
-    )[0];
-
-    const pendingClient = new PaymentsAppsClient(
-      pendingSession.shop,
-      pendingSession.accessToken,
-      PAYMENT
-    );
-
-    await pendingClient.pendSession({
-      id: paymentSession.id,
-      kind: paymentSession.kind,
-      gid: paymentSession.gid,
-    });
   };
 
   /**
@@ -560,6 +544,9 @@ export default class UnzerWebhookClient {
            * Payment Session
            */
           if (this.event === UnzerWebhookEvent.PAYMENT_CANCELED) {
+            if (paymentStatus.transactions.length === 1 && paymentStatus.transactions[0].status === 'error') {
+              return PaymentSessionStatus.CANCELED;
+            }
             if (paymentStatus.amount.total === "0.0000") {
               return PaymentSessionStatus.VOIDED;
             }

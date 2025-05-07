@@ -12,6 +12,6 @@ database.sqlite
 /postgres-data
 
 .env
-.env.staging
+.env.*
 yarn-error.log
 .DS_Store
