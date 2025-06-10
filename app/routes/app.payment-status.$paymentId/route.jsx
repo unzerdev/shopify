@@ -233,7 +233,7 @@ const Authorizations = ({ onOpenModal }) => {
 
   const authorizeRows = authorizations.map((authorization) => {
     const date = new Date(authorization.date);
-    const message = JSON.parse(authorization.message || "");
+    const message = JSON.parse(authorization.message || "null");
 
     return [
       authorization.authorizeId,
@@ -242,7 +242,7 @@ const Authorizations = ({ onOpenModal }) => {
         amount: authorization.amount,
         currency: authorization.currency,
       }),
-      message.merchant,
+      message !== null ? message.merchant : "",
       <Button
         onClick={() =>
           onOpenModal({
@@ -281,16 +281,17 @@ const Charges = ({ onOpenModal }) => {
 
   const chargeRows = charges.map((charge) => {
     const date = new Date(charge.date);
-    const message = JSON.parse(charge.message || "");
+    const message = JSON.parse(charge.message || "null");
+    
     return [
       charge.chargeId,
       date.toUTCString(),
       formatMoney({ amount: charge.amount, currency: charge.currency }),
-      message.merchant,
+      message !== null ? message.merchant : "",
       <Button
         onClick={() =>
           onOpenModal({
-            title: "Authorization",
+            title: "Charge",
             content: charge,
           })
         }
@@ -368,17 +369,17 @@ const Cancels = ({ onOpenModal }) => {
 
   const cancelRows = cancels.map((cancel) => {
     const date = new Date(cancel.date);
-    const message = JSON.parse(cancel.message);
+    const message = JSON.parse(cancel.message || "null");
 
     return [
       cancel.cancelId,
       date.toUTCString(),
       formatMoney({ amount: cancel.amount, currency: cancel.currency }),
-      message.merchant,
+      message !== null ? message.merchant : "",
       <Button
         onClick={() =>
           onOpenModal({
-            title: "Authorization",
+            title: "Cancel",
             content: cancel,
           })
         }
@@ -421,7 +422,7 @@ const Refunds = ({ onOpenModal }) => {
       <Button
         onClick={() =>
           onOpenModal({
-            title: "Authorization",
+            title: "Refund",
             content: refund,
           })
         }
