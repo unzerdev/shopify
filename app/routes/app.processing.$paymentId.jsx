@@ -99,22 +99,23 @@ export const loader = async ({ request, params: { paymentId } }) => {
         const session = (
           await sessionStorage.findSessionsByShop(paymentSession.shop)
         )[0];
-    
+
         if (session.accessToken === undefined) {
           log(`No Access Token found for this Store: ${session.shop}`);
           return new Response("Server error", { status: 500 });
         }
-    
+
         const client = new PaymentsAppsClient(
           session.shop,
           session.accessToken,
           PAYMENT
         );
-    
+
         log("Rejecting Payment Session");
         const response = await client.rejectSession({
           id: paymentSession.id,
           gid: paymentSession.gid,
+          code: "PAYMENT_METHOD_DECLINED",
         });
 
         return redirect(response.paymentSession.nextAction.context.redirectUrl);
