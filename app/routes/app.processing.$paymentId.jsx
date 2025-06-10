@@ -91,6 +91,36 @@ export const loader = async ({ request, params: { paymentId } }) => {
       );
 
       /**
+       * When there's a transaction in progress, we need
+       * to reject the payment to provide the correct
+       * status to the customer
+       */
+      if (paymentStatus.transactions.length > 0) {
+        const session = (
+          await sessionStorage.findSessionsByShop(paymentSession.shop)
+        )[0];
+    
+        if (session.accessToken === undefined) {
+          log(`No Access Token found for this Store: ${session.shop}`);
+          return new Response("Server error", { status: 500 });
+        }
+    
+        const client = new PaymentsAppsClient(
+          session.shop,
+          session.accessToken,
+          PAYMENT
+        );
+    
+        log("Rejecting Payment Session");
+        const response = await client.rejectSession({
+          id: paymentSession.id,
+          gid: paymentSession.gid,
+        });
+
+        return redirect(response.paymentSession.nextAction.context.redirectUrl);
+      }
+
+      /**
        * Rejecting a payment is final. You can't call other actions on a payment after it has been rejected.
        * The payments app should retry a failed user attempt and complete the payment before calling paymentSessionReject.
        * For example, if any of the following conditions are met, then you don't need to reject the payment:
