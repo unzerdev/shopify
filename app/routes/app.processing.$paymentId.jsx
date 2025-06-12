@@ -112,13 +112,17 @@ export const loader = async ({ request, params: { paymentId } }) => {
         );
 
         log("Rejecting Payment Session");
-        const response = await client.rejectSession({
-          id: paymentSession.id,
-          gid: paymentSession.gid,
-          code: "PAYMENT_METHOD_DECLINED",
-        });
 
-        return redirect(response.paymentSession.nextAction.context.redirectUrl);
+        try {
+          const response = await client.rejectSession({
+            id: paymentSession.id,
+            gid: paymentSession.gid,
+          });
+
+          return redirect(response.paymentSession.nextAction.context.redirectUrl);
+        } catch (error) {
+          log("Error Rejecting Payment Session");
+        }
       }
 
       /**
