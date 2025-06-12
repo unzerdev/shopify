@@ -64,10 +64,13 @@ export default class PaymentsAppsClient {
 
   /**
    * Generic session rejection function
-   * @param {*} session the session to reject upon
+   * @param {object} sessionData
+   * @param {string} sessionData.id - The Payment Session ID
+   * @param {string} sessionData.gid - The Payment Session GraphQL ID
+   * @param {string} [sessionData.code] - This is a standardized reason code. Possible options: CANCELED_BY_USER, PAYMENT_METHOD_DECLINED or PROCESSING_ERROR
    * @returns the response body from the Shopify Payments Apps API
    */
-  async rejectSession({ id, gid }) {
+  async rejectSession({ id, gid, code = "PROCESSING_ERROR" }) {
     log(`Rejecting session: ${this.type}`);
     paymentLog({
       paymentId: id,
@@ -77,7 +80,7 @@ export default class PaymentsAppsClient {
     const response = await this.#perform(schema[this.rejectMutation], {
       id: gid,
       reason: {
-        code: "PROCESSING_ERROR",
+        code,
         merchantMessage: "The session was rejected.",
       },
     });
@@ -178,7 +181,7 @@ export default class PaymentsAppsClient {
       externalHandle,
       ready,
     });
-    
+
     return response?.paymentsAppConfigure;
   }
 
