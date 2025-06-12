@@ -1,7 +1,7 @@
 import { LogMessageType } from "@prisma/client";
 import { json } from "@remix-run/node";
 
-import { createUnzerCancel, createVoidSession, getConfigurationByShopName, getPaymentSession } from "~/payments.repository.server";
+import { createVoidSession, getConfigurationByShopName, getPaymentSession } from "~/payments.repository.server";
 import { createLogger, createPaymentLogger } from "~/utils/lib";
 import UnzerClient from "~/utils/unzer-client.server";
 

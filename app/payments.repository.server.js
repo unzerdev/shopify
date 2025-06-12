@@ -162,12 +162,21 @@ export const getPaymentSessions = async (shopName, page = 1, take = 25) => {
  * Creates a RefundSession entity with the provided data.
  */
 export const createRefundSession = async (refundSession) => {
-  const { amount } = refundSession;
-  return await prisma.refundSession.create({
-    data: {
-      ...refundSession,
-      amount: parseFloat(amount),
+  const { id, gid, amount, ...restData } = refundSession;
+  return await prisma.refundSession.upsert({
+    where: {
+      id: id
     },
+    update: {
+      ...restData,
+      amount: parseFloat(amount)
+    },
+    create: {
+      id,
+      gid,
+      amount: parseFloat(amount),
+      ...restData,
+    }
   });
 };
 

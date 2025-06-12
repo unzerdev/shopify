@@ -122,7 +122,6 @@ export default class UnzerClient {
    * @see https://api.unzer.com/api-reference/index.html#tag/Payments/operation/cancelChargesByPayment
    *
    * @param {string} paymentId - A unique paymentId or orderId.
-   * @param {string} chargeId - The chargeId of the given payment.
    * @param {object} [payload]
    * @param {string} [payload.amount] - The amount in a positive decimal value. Accepted length: Decimal{10,4}. If no amount is provided, the full payment amount is canceled
    * @param {string} [payload.paymentReference] - An additional description for the transaction
@@ -133,9 +132,9 @@ export default class UnzerClient {
    *
    * @returns {Promise<CancelChargeResponse>}
    */
-  async cancel(paymentId, chargeId, payload) {
+  async cancel(paymentId, payload) {
     const response = await this.#callApi(
-      `${API_URL}/v1/payments/${paymentId}/charges/${chargeId}/cancels`,
+      `${API_URL}/v1/payments/${paymentId}/charges/cancels`,
       "POST",
       payload
     );
