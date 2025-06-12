@@ -3,7 +3,6 @@ import { json } from "@remix-run/node";
 
 import {
   createRefundSession,
-  createUnzerCancel,
   getConfigurationByShopName,
   getPaymentSession,
 } from "~/payments.repository.server";
@@ -22,7 +21,6 @@ export const action = async ({ request }) => {
 
   const refundSessionHash = createParams(requestBody);
   const refundSession = await createRefundSession(refundSessionHash);
-
   const paymentSession = await getPaymentSession(refundSession.paymentId);
 
   if (!refundSession)
@@ -55,24 +53,12 @@ export const action = async ({ request }) => {
 
   const unzerClient = new UnzerClient(config.unzerPrivateKey);
 
-  const charge = paymentSession.charges[0];
-
   const cancel = await unzerClient.cancel(
     paymentSession.pid,
-    charge.chargeId,
     {
       amount: refundSessionHash.amount,
     }
   );
-
-  await createUnzerCancel({
-    cancelId: cancel.id,
-    chargeId: charge.chargeId,
-    paymentId: paymentSession.id,
-    refundId: refundSession.id,
-    amount: refundSession.amount,
-    currency: refundSession.currency,
-  });
 
   paymentLog({
     paymentId: paymentSession.id,
