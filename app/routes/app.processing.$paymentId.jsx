@@ -75,7 +75,8 @@ export const loader = async ({ request, params: { paymentId } }) => {
 
     if (
       paymentStatus.state.name === "canceled" ||
-      paymentStatus.state.name === "create"
+      paymentStatus.state.name === "create" ||
+      paymentStatus.state.name === "pending" 
     ) {
       log("Canceling Payment Session");
       paymentLog({
