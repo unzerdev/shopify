@@ -72,11 +72,11 @@ export const loader = async ({ request, params: { paymentId } }) => {
 
     // Check payment status
     const paymentStatus = await unzerClient.getPayment(paymentSession.pid);
+    const paymentTransactionStatus = checkTransactionStatusFromPayment(paymentStatus);
 
+    console.log('paymentStatus', paymentStatus);
     if (
-      paymentStatus.state.name === "canceled" ||
-      paymentStatus.state.name === "create" ||
-      paymentStatus.state.name === "pending" 
+      paymentTransactionStatus !== 'COMPLETED' && paymentTransactionStatus !== 'SUCCESS'
     ) {
       log("Canceling Payment Session");
       paymentLog({
@@ -120,7 +120,9 @@ export const loader = async ({ request, params: { paymentId } }) => {
             gid: paymentSession.gid,
           });
 
-          return redirect(response.paymentSession.nextAction.context.redirectUrl);
+          return redirect(
+            response.paymentSession.nextAction.context.redirectUrl
+          );
         } catch (error) {
           log("Error Rejecting Payment Session");
         }
@@ -280,4 +282,21 @@ function createCustomerHash({
       country: shipping_address.country_code,
     },
   };
+}
+
+function checkTransactionStatusFromPayment(paymentStatus) {
+  switch (paymentStatus.name) {
+    case 'create':
+      return 'CREATED';
+    case 'canceled':
+      return 'CANCELED';
+    case 'pending':
+      const transaction = paymentStatus.transactions[0];
+      if (transaction.status === "success") {
+        return 'SUCCESS';
+      }
+      return 'PENDING';
+    default:
+      return 'COMPLETED';
+  }
 }
