@@ -286,7 +286,7 @@ function createCustomerHash({
 }
 
 function checkTransactionStatusFromPayment(paymentStatus) {
-  switch (paymentStatus.name) {
+  switch (paymentStatus.state.name) {
     case "create":
       return "CREATED";
     case "canceled":
