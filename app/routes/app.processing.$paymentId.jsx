@@ -74,7 +74,6 @@ export const loader = async ({ request, params: { paymentId } }) => {
     const paymentStatus = await unzerClient.getPayment(paymentSession.pid);
     const paymentTransactionStatus = checkTransactionStatusFromPayment(paymentStatus);
 
-    console.log('paymentStatus', paymentStatus);
     if (
       paymentTransactionStatus !== 'COMPLETED' && paymentTransactionStatus !== 'SUCCESS'
     ) {
