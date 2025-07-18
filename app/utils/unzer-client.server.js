@@ -249,14 +249,13 @@ export default class UnzerClient {
    * Docs: https://api.unzer.com/api-reference/index.html#tag/Customer/operation/createCustomer_1
    * Docs: https://api.unzer.com/api-reference/index.html#tag/Customer-v1/operation/updateCustomer_1
    *
-   * @param {CustomerData} payload
+   * @param {CustomerData} customerData
    *
    * @returns Promise<void>
    */
-  async createCustomer(payload) {
+  async createCustomer(customerData) {
     log("Checking if Customer exists");
-    const customer = await this.getCustomer(payload.email);
-    const customerData = this.#enrichCustomer(payload);
+    const customer = await this.getCustomer(customerData.email);
 
     if (!customer.isError) {
       log("Using existing Customer");
@@ -504,27 +503,6 @@ export default class UnzerClient {
     const data = await response.json();
 
     return data;
-  }
-
-  /**
-   * 
-   * @param {CustomerData} customerData
-   *
-   * @returns Object
-   */
-  #enrichCustomer(customerData) {
-    const shippingAddress = JSON.stringify(customerData.shippingAddress);
-    const billingAddress = JSON.stringify(customerData.billingAddress);
-
-    if (shippingAddress === billingAddress) {
-      customerData.shippingAddress.shippingType = 'equals-billing';
-    } else {
-      customerData.shippingAddress.shippingType = 'different-address';
-    }
-
-    return {
-      ...customerData
-    }
   }
 
   /**

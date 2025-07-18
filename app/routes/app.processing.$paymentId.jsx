@@ -260,6 +260,17 @@ function createCustomerHash({
   billing_address,
   shipping_address,
 }) {
+  const shippingAddress = JSON.stringify(shipping_address);
+  const billingAddress = JSON.stringify(billing_address);
+  const shippingType = (() => {
+    if (shippingAddress === billingAddress) {
+      return 'equals-billing';
+    }
+
+    return 'different-address';
+  })();
+  
+
   return {
     lastname: billing_address.family_name,
     firstname: billing_address.given_name,
@@ -267,6 +278,7 @@ function createCustomerHash({
     email,
     ...(billing_address.phone ? { phone: billing_address.phone } : {}),
     language: locale.split("-")[0],
+    company: shipping_address.company || billing_address.company,
     billingAddress: {
       name: `${billing_address.given_name} ${billing_address.family_name}`,
       street: billing_address.line1,
@@ -282,6 +294,7 @@ function createCustomerHash({
       zip: shipping_address.postal_code,
       city: shipping_address.city,
       country: shipping_address.country_code,
+      shippingType
     },
   };
 }
