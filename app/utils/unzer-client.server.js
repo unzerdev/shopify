@@ -321,7 +321,9 @@ export default class UnzerClient {
   async getMetadata(metadataId) {
     log("Fetching Metadata Data");
 
-    const response = await this.#callApi(`${API_URL}/v1/metadata/${metadataId}`);
+    const response = await this.#callApi(
+      `${API_URL}/v1/metadata/${metadataId}`
+    );
     const data = await response.json();
 
     return data;
@@ -344,7 +346,11 @@ export default class UnzerClient {
 
     const requestBody = { ...payload };
     requestBody.resources = requestBody.resources || {};
-
+    requestBody.additionalAttributes = {
+      "customerFields.paylater-installment": "birthdate",
+      "customerFields.paylater-invoice": "birthdate",
+      "customerFields.paylater-direct-debit": "birthdate",
+    };
     if (this.customerResourceId) {
       requestBody.resources.customerId = this.customerResourceId;
     }
@@ -513,7 +519,7 @@ export default class UnzerClient {
  * @property {string[]} availablePaymentTypes
  *
  * @typedef {"create" | "pending" | "completed" | "canceled" | "partly" | "payment review" | "chargeback"} PaymentStateName
- * 
+ *
  * @typedef {Object} Transaction
  * @property {string} participantId
  * @property {string} date
@@ -526,7 +532,7 @@ export default class UnzerClient {
  * @property {string} id - The id of payment (ex: s-pay-1).
  * @property {Object} state
  * @property {number} state.id
- * @property {PaymentStateName} state.name 
+ * @property {PaymentStateName} state.name
  * @property {Object} amount - Summary of all amounts
  * @property {string} amount.total - Initial amount reduced by cancellations during authorization
  * @property {string} amount.charged - Already charged amount
@@ -691,6 +697,7 @@ export default class UnzerClient {
  * @property {boolean} [shippingAddressRequired] - A flag for specifying if a shipping address is required or not.
  * @property {string[]} [excludeTypes] - A list of payment types to be excluded on the paypage.
  * @property {string} [paymentReference] - An additional description for the transaction
+ * @property {Object} [additionalAttributes] - A map for defining additional attributes for specific payment methods like installment-secured (effectiveInterestRate).
  * @property {Resources} [resources]
  */
 
