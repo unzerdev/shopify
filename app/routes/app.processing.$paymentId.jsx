@@ -77,7 +77,8 @@ export const loader = async ({ request, params: { paymentId } }) => {
 
     if (
       paymentTransactionStatus !== "COMPLETED" &&
-      paymentTransactionStatus !== "SUCCESS"
+      paymentTransactionStatus !== "SUCCESS" &&
+      paymentTransactionStatus !== "PENDING"
     ) {
       log("Canceling Payment Session");
       paymentLog({
@@ -285,6 +286,11 @@ function createCustomerHash({
   };
 }
 
+/**
+ * Resolves a partial Payment Status from the latest Payment Status
+ * @param {import('~/utils/unzer-client.server').PaymentData} paymentStatus 
+ * @returns {"CREATED" | "CANCELED" | "SUCCESS" | "PENDING" | "COMPLETED"}
+ */
 function checkTransactionStatusFromPayment(paymentStatus) {
   switch (paymentStatus.state.name) {
     case "create":

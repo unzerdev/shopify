@@ -512,6 +512,8 @@ export default class UnzerClient {
  * @property {string} publicKey
  * @property {string[]} availablePaymentTypes
  *
+ * @typedef {"create" | "pending" | "completed" | "canceled" | "partly" | "payment review" | "chargeback"} PaymentStateName
+ * 
  * @typedef {Object} Transaction
  * @property {string} participantId
  * @property {string} date
@@ -524,7 +526,7 @@ export default class UnzerClient {
  * @property {string} id - The id of payment (ex: s-pay-1).
  * @property {Object} state
  * @property {number} state.id
- * @property {string} state.name
+ * @property {PaymentStateName} state.name 
  * @property {Object} amount - Summary of all amounts
  * @property {string} amount.total - Initial amount reduced by cancellations during authorization
  * @property {string} amount.charged - Already charged amount
